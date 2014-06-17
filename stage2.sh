@@ -27,8 +27,9 @@ mysql -u root -p${MYSQL_PWD} -e "GRANT ALL PRIVILEGES ON keystone.* TO 'keystone
 ADMIN_TOKEN=$(openssl rand -hex 12)
 echo "ADMIN_TOKEN password: ${ADMIN_TOKEN}" >> openstack_passwords.txt
  
-sed -i '/\[DEFAULT\]/a log_dir = /var/log/keystone' /etc/keystone/keystone.conf
-sed -i '/\[DEFAULT\]/a admin_token = '"${ADMIN_TOKEN}"'' /etc/keystone/keystone.conf
+sed -i '/admin_token=ADMIN/a log_dir = /var/log/keystone' /etc/keystone/keystone.conf
+sed -i '/admin_token=ADMIN/a admin_token = '"${ADMIN_TOKEN}"'' /etc/keystone/keystone.conf
+
 service keystone restart
  
 (crontab -l -u keystone 2>&1 | grep -q token_flush) || echo '@hourly /usr/bin/keystone-manage token_flush >/var/log/keystone/keystone-tokenflush.log 2>&1' >> /var/spool/cron/crontabs/keystone
