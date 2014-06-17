@@ -16,7 +16,7 @@ echo "glance emai: ${GLANCE_EMAIL}" >> openstack_passwords.txt
 ADMIN_PASS=$(cat openstack_passwords.txt | grep ADMIN_PASS | awk '{print $3}')
 
 sed -i '/connection = <None>/a connection = mysql://glance:'"${GLANCE_DBPASS}"'@'"$(hostname)"'/glance' /etc/glance/glance-api.conf
-sed -i '/rabbit_host = localhost/a rpc_backend = rabbit' etc/glance/glance-api.conf
+sed -i '/rabbit_host = localhost/a rpc_backend = rabbit' /etc/glance/glance-api.conf
 sed -i 's/rabbit_host = localhost/rabbit_host = '"$(hostname)"'/' /etc/glance/glance-api.conf
 sed -i 's/rabbit_password = guest/rabbit_password = '"${RABBIT_PASS}"'/' /etc/glance/glance-api.conf
 sed -i '/\[keystone_authtoken\]/a auth_uri = http://'"$(hostname)"':5000' /etc/glance/glance-api.conf
