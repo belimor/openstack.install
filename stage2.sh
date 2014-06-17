@@ -46,6 +46,7 @@ echo "DEMO_EMAIL password: ${DEMO_EMAIL}" >> openstack_passwords.txt
  
 export OS_SERVICE_TOKEN="${ADMIN_TOKEN}"
 export OS_SERVICE_ENDPOINT="http://${MY_HOSTNAME}:35357/v2.0"
+sleep 5
 keystone user-create --name=admin --pass=${ADMIN_PASS} --email=${ADMIN_EMAIL}
 keystone role-create --name=admin
 keystone tenant-create --name=admin --description="Admin Tenant"
