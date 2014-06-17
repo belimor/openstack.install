@@ -16,7 +16,7 @@ apt-get install -y python-mysqldb mysql-server
 controller_ip=$(/sbin/ifconfig eth0 | grep 'inet addr:' | cut -d: -f2 | awk '{ print $1}')
  
 # edit /etc/mysql/my.cnf
-sed -i 's/127.0.0.1/'"${controller_ip}"'/' /etc/mysql/my.cnf
+sed -i 's/127.0.0.1/'"$(hostname)"'/' /etc/mysql/my.cnf
 sed -i '/\[mysqld\]/a character-set-server = utf8' /etc/mysql/my.cnf
 sed -i '/\[mysqld\]/a init-connect = '"'"'SET NAMES utf8'"'"'' /etc/mysql/my.cnf
 sed -i '/\[mysqld\]/a collation-server = utf8_general_ci' /etc/mysql/my.cnf
