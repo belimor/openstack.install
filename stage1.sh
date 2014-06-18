@@ -45,7 +45,7 @@ send \"y\r\"
 expect eof
 ")
 echo "$SECURE_MYSQL"
-apt-get --purge rempve expect
+apt-get purge expect
  
 # install openstack packages
 apt-get install -y python-software-properties

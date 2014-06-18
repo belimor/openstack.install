@@ -19,6 +19,10 @@ sleep 5
 
 echo ""
 echo "### === script === ###" >> /etc/nova/nova.conf
+echo ""
+echo "network_api_class = nova.network.api.API" >> /etc/nova/nova.conf
+echo "security_group_api = nova" >> /etc/nova/nova.conf
+echo ""
 echo "rpc_backend = rabbit" >> /etc/nova/nova.conf
 echo "rabbit_host = $(hostname)" >> /etc/nova/nova.conf
 echo "rabbit_password = ${RABBIT_PASS}" >> /etc/nova/nova.conf
