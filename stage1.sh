@@ -70,7 +70,7 @@ counter "Mysql server has been installed. Next -> Updating /etc/mysql/my.cnf"
 ##########################
 # edit /etc/mysql/my.cnf #
 ##########################
-iniset /etc/mysql/my.cnf mysqld bind ${CTRL_MGT_IP}
+iniset /etc/mysql/my.cnf mysqld bind-address ${CTRL_MGT_IP}
 iniset /etc/mysql/my.cnf mysqld character-set-server 'utf8'
 iniset /etc/mysql/my.cnf mysqld init-connect 'SET NAMES utf8'
 iniset /etc/mysql/my.cnf mysqld collation-server 'utf8_general_ci'
