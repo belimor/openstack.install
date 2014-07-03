@@ -1,12 +1,13 @@
 #!/bin/bash
 
-controller="cloud"
-my_ip="$(hostname)"
+controller="192.168.1.1"
+my_ip="192.168.1.2"
 NOVA_DBPASS="$(cat openstack_passwords.txt | grep dbnova | awk '{print $3}')"
 NOVA_PASS="$(cat openstack_passwords.txt | grep nova | awk '{print $3}')"
 RABBIT_PASS="$(cat openstack_passwords.txt | grep rabbit | awk '{print $3}')"
 
-apt-get install -y nova-compute-kvm python-guestfs
+apt-get install -y nova-compute-kvm 
+#python-guestfs
 dpkg-statoverride  --update --add root root 0644 /boot/vmlinuz-$(uname -r)
 
 echo "#!/bin/sh" > /etc/kernel/postinst.d/statoverride
