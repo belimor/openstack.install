@@ -100,7 +100,7 @@ send \"y\r\"
 expect eof
 ")
 echo "$SECURE_MYSQL"
-apt-get purge expect
+apt-get purge -y expect
 counter "mysql_secure_installation script has been completed. Next -> python-software-properties and system upgrade"
 ###################################### 
 # install python-software-properties #
