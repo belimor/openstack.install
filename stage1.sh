@@ -6,7 +6,7 @@
 #
 
 function counter {
-echo "" && echo "" echo "$1"
+echo " " && echo " " && echo "#############" && echo "$1" && echo "#############"
 echo " Press Ctrl+C if you want to cansel"
 echo -ne '[.     ]\r' && sleep 1 && echo -ne '[..    ]\r' && sleep 1 
 echo -ne '[...   ]\r' && sleep 1 && echo -ne '[....  ]\r' && sleep 1

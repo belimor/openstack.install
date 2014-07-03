@@ -2,18 +2,17 @@
 
 apt-get install -y glance python-glanceclient
 
-echo "==== Stage 3 ==========" >> openstack_passwords.txt
 GLANCE_DBPASS=$(openssl rand -hex 12)
-echo "dbglance password: ${GLANCE_DBPASS}" >> openstack_passwords.txt
 GLANCE_PASS=$(openssl rand -hex 12)
-echo "glance password: ${GLANCE_PASS}" >> openstack_passwords.txt
-
 RABBIT_PASS=$(cat openstack_passwords.txt | grep rabbit | awk '{print $3}')
 MYSQL_PWD=$(cat openstack_passwords.txt | grep mysql | awk '{print $3}')
-GLANCE_EMAIL="13@cybera.ca"
-echo "glance emai: ${GLANCE_EMAIL}" >> openstack_passwords.txt
-
+GLANCE_EMAIL="email@cybera.ca"
 ADMIN_PASS=$(cat openstack_passwords.txt | grep ADMIN_PASS | awk '{print $3}')
+echo "==== Stage 3 ==========" >> openstack_passwords.txt
+echo "glance emai: ${GLANCE_EMAIL}" >> openstack_passwords.txt
+echo "glance password: ${GLANCE_PASS}" >> openstack_passwords.txt
+echo "dbglance password: ${GLANCE_DBPASS}" >> openstack_passwords.txt
+
 
 sed -i '/connection = <None>/a connection = mysql://glance:'"${GLANCE_DBPASS}"'@'"$(hostname)"'/glance' /etc/glance/glance-api.conf
 sed -i '/rabbit_host = localhost/a rpc_backend = rabbit' /etc/glance/glance-api.conf
@@ -43,6 +42,12 @@ export OS_USERNAME="admin"
 export OS_PASSWORD="${ADMIN_PASS}"
 export OS_TENANT_NAME="admin"
 export OS_AUTH_URL="http://$(hostname):35357/v2.0"
+
+echo 'export OS_USERNAME="admin"' > admin.src
+echo 'export OS_PASSWORD="${ADMIN_PASS}"' >> admin.src
+echo 'export OS_TENANT_NAME="admin"' >> admin.src
+echo 'export OS_AUTH_URL="http://$(hostname):35357/v2.0"' >> admin.src
+
 sleep 5
 
 /bin/sh -c "glance-manage db_sync" glance

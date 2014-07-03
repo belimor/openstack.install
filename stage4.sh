@@ -2,15 +2,18 @@
 
 apt-get install -y nova-api nova-cert nova-conductor nova-consoleauth nova-novncproxy nova-scheduler python-novaclient
 
-echo "==== Stage 4 ==========" >> openstack_passwords.txt
 RABBIT_PASS=$(cat openstack_passwords.txt | grep rabbit | awk '{print $3}')
 NOVA_DBPASS=$(openssl rand -hex 12)
-echo "dbnova password: ${NOVA_DBPASS}" >> openstack_passwords.txt
 NOVA_PASS=$(openssl rand -hex 12)
-echo "nova password: ${NOVA_PASS}" >> openstack_passwords.txt
 MYSQL_PWD=$(cat openstack_passwords.txt | grep mysql | awk '{print $3}')
-NOVA_EMAIL="13@cybera.ca"
+NOVA_EMAIL="email@cybera.ca"
 ADMIN_PASS=$(cat openstack_passwords.txt | grep ADMIN_PASS | awk '{print $3}')
+MGT_IP=$(cat openstack_passwords.txt | grep management.ip.address | awk '{print $3}')
+
+echo "==== Stage 4 ==========" >> openstack_passwords.txt
+echo "dbnova password: ${NOVA_DBPASS}" >> openstack_passwords.txt
+echo "nova password: ${NOVA_PASS}" >> openstack_passwords.txt
+
 export OS_USERNAME="admin"
 export OS_PASSWORD="${ADMIN_PASS}"
 export OS_TENANT_NAME="admin"
@@ -27,7 +30,7 @@ echo "rpc_backend = rabbit" >> /etc/nova/nova.conf
 echo "rabbit_host = $(hostname)" >> /etc/nova/nova.conf
 echo "rabbit_password = ${RABBIT_PASS}" >> /etc/nova/nova.conf
 echo "" >> /etc/nova/nova.conf
-echo "my_ip = $(hostname)" >> /etc/nova/nova.conf
+echo "my_ip = ${MGT_IP}" >> /etc/nova/nova.conf
 echo "vncserver_listen = $(hostname)" >> /etc/nova/nova.conf
 echo "vncserver_proxyclient_address = $(hostname)" >> /etc/nova/nova.conf
 echo "" >> /etc/nova/nova.conf
