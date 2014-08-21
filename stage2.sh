@@ -58,3 +58,4 @@ keystone tenant-create --name=service --description="Service Tenant"
 keystone service-create --name=keystone --type=identity --description="OpenStack Identity"
 keystone endpoint-create --service-id=$(keystone service-list | awk '/ identity / {print $2}') --publicurl=http://${MY_HOSTNAME}:5000/v2.0 --internalurl=http://${MY_HOSTNAME}:5000/v2.0 --adminurl=http://${MY_HOSTNAME}:35357/v2.0
 
+echo "end"
