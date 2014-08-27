@@ -2,7 +2,7 @@
 ###############
 # OpenStack Installation Script
 # Part 2 
-# Install ntp, mysql-server, python-software-properties. Upgrade and reboot
+# Install rabbit and keystone
 #
 
 function counter {
@@ -26,6 +26,7 @@ MYSQL_PWD=$(cat openstack_passwords.txt | grep mysql | awk '{print $3}')
 ADMIN_PASS="password"
 ADMIN_EMAIL="email@cybera.ca"
 
+echo "==== Stage 2 ==========" >> openstack_passwords.txt
 echo "rabbit password: ${RABBIT_PWD}" >> openstack_passwords.txt
 echo "keystone password: ${KEYSTONE_DBPASS}" >> openstack_passwords.txt
 echo "ADMIN_TOKEN password: ${ADMIN_TOKEN}" >> openstack_passwords.txt
