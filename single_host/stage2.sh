@@ -62,9 +62,10 @@ export OS_SERVICE_ENDPOINT="http://${MY_HOSTNAME}:35357/v2.0"
 sleep 5
 keystone user-create --name=admin --pass=${ADMIN_PASS} --email=${ADMIN_EMAIL}
 keystone role-create --name=admin
+keystone role-create --name=member
 keystone tenant-create --name=admin --description="Admin Tenant"
 keystone user-role-add --user=admin --tenant=admin --role=admin
-keystone user-role-add --user=admin --role=_member_ --tenant=admin
+keystone user-role-add --user=admin --tenant=admin --role=member
 keystone tenant-create --name=service --description="Service Tenant"
  
 keystone service-create --name=keystone --type=identity --description="OpenStack Identity"
