@@ -14,52 +14,20 @@ echo -ne '[..... ]\r' && sleep 1 && echo -ne '[......]\r' && sleep 1
 echo -ne '\n'
 }
 
-function ini_has_option() {
-    local file=$1
-    local section=$2
-    local option=$3
-    local line
-    line=$(sed -ne "/^\[$section\]/,/^\[.*\]/ { /^$option[ \t]*=/ p; }" "$file")
-    [ -n "$line" ]
-}
-
-function iniset() {
-    local file=$1
-    local section=$2
-    local option=$3
-    local value=$4
- 
-    [[ -z $section || -z $option ]] && return
- 
-    if ! grep -q "^\[$section\]" "$file" 2>/dev/null; then
-        # Add section at the end
-        echo -e "\n[$section]" >>"$file"
-    fi
-    if ! ini_has_option "$file" "$section" "$option"; then
-        # Add it
-        sed -i -e "/^\[$section\]/ a\\
-$option = $value
-" "$file"
-    else
-        local sep=$(echo -ne "\x01")
-        # Replace it
-        sed -i -e '/^\['${section}'\]/,/^\[.*\]/ s'${sep}'^\('${option}'[ \t]*=[ \t]*\).*$'${sep}'\1'"${value}"${sep} "$file"
-    fi
-}
-
 #########################
 # VARIABLES DECLARATION #
 #########################
 MYSQL_PWD=$(openssl rand -hex 12)
-CTRL_MGT_IP=$(/sbin/ifconfig eth1 | grep 'inet addr:' | cut -d: -f2 | awk '{ print $1}')
 CTRL_PUB_IP=$(/sbin/ifconfig eth0 | grep 'inet addr:' | cut -d: -f2 | awk '{ print $1}')
 echo "controller public.ip.address ${CTRL_PUB_IP}" > openstack_passwords.txt
-echo "controller management.ip.address ${CTRL_MGT_IP}" >> openstack_passwords.txt
 echo "mysql password: ${MYSQL_PWD}" >> openstack_passwords.txt
-
+#############################
+# update system install ntp #
+#############################
 apt-get update
+apt-get upgrade
 apt-get install -y ntp
-counter "Ntp has been installed. Next -> Mysql server installation"
+counter "System has been updated. Ntp has been installed. Next -> Mysql server installation"
 ######################## 
 # install mysql server #
 ########################
@@ -70,12 +38,7 @@ counter "Mysql server has been installed. Next -> Updating /etc/mysql/my.cnf"
 ##########################
 # edit /etc/mysql/my.cnf #
 ##########################
-iniset /etc/mysql/my.cnf mysqld bind-address ${CTRL_MGT_IP}
-iniset /etc/mysql/my.cnf mysqld character-set-server 'utf8'
-iniset /etc/mysql/my.cnf mysqld init-connect 'SET NAMES utf8'
-iniset /etc/mysql/my.cnf mysqld collation-server 'utf8_general_ci'
-iniset /etc/mysql/my.cnf mysqld innodb_file_per_table
-iniset /etc/mysql/my.cnf mysqld default-storage-engine 'innodb'
+cp my.cnf /etc/mysql/my.cnf
 service mysql restart
 counter "/etc/mysql/my.cnf has been updated. Next -> mysql_secure_installation script"
 ######################################## 
@@ -101,13 +64,10 @@ expect eof
 ")
 echo "$SECURE_MYSQL"
 apt-get purge -y expect
-counter "mysql_secure_installation script has been completed. Next -> python-software-properties and system upgrade"
+counter "mysql_secure_installation script has been completed. Next -> python-software-properties"
 ###################################### 
 # install python-software-properties #
 ######################################
 apt-get install -y python-software-properties
-apt-get update
-apt-get dist-upgrade -y
-counter "Rebooting the system"
-reboot
 
+echo "end of stage1"
