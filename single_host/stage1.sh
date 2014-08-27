@@ -25,7 +25,7 @@ echo "mysql password: ${MYSQL_PWD}" >> openstack_passwords.txt
 # update system install ntp #
 #############################
 apt-get update
-apt-get upgrade
+apt-get dist-upgrade
 apt-get install -y ntp
 counter "System has been updated. Ntp has been installed. Next -> Mysql server installation"
 ######################## 
