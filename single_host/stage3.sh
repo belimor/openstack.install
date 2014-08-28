@@ -73,7 +73,8 @@ echo 'export OS_PASSWORD="${ADMIN_PASS}"' >> admin.src
 echo 'export OS_TENANT_NAME="admin"' >> admin.src
 echo 'export OS_AUTH_URL="http://$(hostname):35357/v2.0"' >> admin.src
 
-sleep 5
+cat admin.src
+counter "admin.src has been created."
 
 /bin/sh -c "glance-manage db_sync" glance
 keystone user-create --name=glance --pass=${GLANCE_PASS} --email=${GLANCE_EMAIL}
