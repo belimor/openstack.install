@@ -2,7 +2,7 @@
 ###############
 # OpenStack Installation Script
 # Part 4 
-# Install glance
+# Install nova services
 # 
 
 function counter {
