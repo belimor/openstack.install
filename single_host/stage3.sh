@@ -3,7 +3,7 @@
 # OpenStack Installation Script
 # Part 3 
 # Install glance
-#
+# test
 
 function counter {
 echo " " && echo " " && echo "#############" && echo "$1" && echo "#############"
