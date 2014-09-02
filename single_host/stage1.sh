@@ -7,7 +7,7 @@
 
 function counter {
 echo " " && echo " " && echo "#############" && echo "$1" && echo "#############"
-echo " Press Ctrl+C if you want to cansel"
+echo " Press Ctrl+C if you want to cancel"
 echo -ne '[.     ]\r' && sleep 1 && echo -ne '[..    ]\r' && sleep 1 
 echo -ne '[...   ]\r' && sleep 1 && echo -ne '[....  ]\r' && sleep 1
 echo -ne '[..... ]\r' && sleep 1 && echo -ne '[......]\r' && sleep 1
@@ -19,7 +19,8 @@ echo -ne '\n'
 #########################
 MYSQL_PWD=$(openssl rand -hex 12)
 CTRL_PUB_IP=$(/sbin/ifconfig eth0 | grep 'inet addr:' | cut -d: -f2 | awk '{ print $1}')
-echo "controller public.ip.address ${CTRL_PUB_IP}" > openstack_passwords.txt
+echo "==== Stage 3 ==========" > openstack_passwords.txt
+echo "controller public.ip.address ${CTRL_PUB_IP}" >> openstack_passwords.txt
 echo "mysql password: ${MYSQL_PWD}" >> openstack_passwords.txt
 #############################
 # update system install ntp #

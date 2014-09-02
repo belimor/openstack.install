@@ -3,11 +3,11 @@
 # OpenStack Installation Script
 # Part 3 
 # Install glance
-# test
+# 
 
 function counter {
 echo " " && echo " " && echo "#############" && echo "$1" && echo "#############"
-echo " Press Ctrl+C if you want to cansel"
+echo " Press Ctrl+C if you want to cancel"
 echo -ne '[.     ]\r' && sleep 1 && echo -ne '[..    ]\r' && sleep 1
 echo -ne '[...   ]\r' && sleep 1 && echo -ne '[....  ]\r' && sleep 1
 echo -ne '[..... ]\r' && sleep 1 && echo -ne '[......]\r' && sleep 1
