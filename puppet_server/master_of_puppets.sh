@@ -4,11 +4,11 @@
 #echo "Acquire::http { Proxy \"http://acng-yyc.cloud.cybera.ca:3142\"; };"  > /etc/apt/apt.conf.d/01-acng
 
 # Set up proper hostname
-echo 127.0.1.1 $(hostname).cybera.ca $(hostname) >> /etc/hosts
+echo 127.0.0.1 $(hostname).cybera.ca $(hostname) >> /etc/hosts
 
 # Installing curl and wget
 apt-get update
-apt-get install -y curl wget
+apt-get install -y curl wget git
 
 cd /root
 wget https://apt.puppetlabs.com/puppetlabs-release-trusty.deb
@@ -16,8 +16,10 @@ dpkg -i puppetlabs-release-trusty.deb
 rm puppetlabs-release-trusty.deb
 apt-get update
 
-echo "Installing Git & Puppet"
-apt-get install -y git puppet=3.6.2-1puppetlabs1 puppet-common=3.6.2-1puppetlabs1
+echo "Installing Puppet"
+apt-get install -y puppetmaster-passenger
+apt-get install -y puppetmaster
+#puppet=3.6.2-1puppetlabs1 puppet-common=3.6.2-1puppetlabs1
 
 mkdir -p /etc/facter/facts.d
 
