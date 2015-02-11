@@ -97,7 +97,7 @@ cd $PROD/modules
 
 git clone https://github.com/puppetlabs/puppetlabs-apache apache
 cd apache
-git checkout tags/1.2.0
+git checkout tags/1.1.1
 cd ..
 
 git clone https://github.com/puppetlabs/puppetlabs-apt apt
