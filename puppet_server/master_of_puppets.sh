@@ -17,7 +17,7 @@ rm puppetlabs-release-trusty.deb
 apt-get update
 
 echo "Installing Puppet"
-apt-get install -y puppetmaster-passenger
+#apt-get install -y puppetmaster-passenger
 apt-get install -y puppetmaster
 #puppet=3.6.2-1puppetlabs1 puppet-common=3.6.2-1puppetlabs1
 
