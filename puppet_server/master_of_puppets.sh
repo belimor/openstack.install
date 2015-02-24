@@ -96,54 +96,24 @@ cat > $SITE/ext/modules.sh <<EOF
 cd $PROD/modules
 
 git clone https://github.com/puppetlabs/puppetlabs-apache apache
-cd apache
-git checkout tags/1.1.1
-cd ..
 
 git clone https://github.com/puppetlabs/puppetlabs-apt apt
-cd apt
-git checkout tags/1.5.0
-cd ..
 
 git clone https://github.com/puppetlabs/puppetlabs-vcsrepo vcsrepo
-cd vcsrepo
-git checkout tags/1.0.0
-cd ..
 
 git clone https://github.com/puppetlabs/puppetlabs-concat concat
-cd concat
-git checkout tags/1.1.0
-cd ..
 
 git clone https://github.com/puppetlabs/puppetlabs-firewall firewall
-cd firewall
-git checkout tags/1.1.3
-cd ..
 
 git clone https://github.com/puppetlabs/puppetlabs-ntp ntp
-cd ntp
-git checkout tags/3.1.0
-cd ..
 
 git clone https://github.com/puppetlabs/puppetlabs-puppetdb puppetdb
-cd puppetdb
-git checkout tags/3.0.1
-cd ..
 
 git clone https://github.com/puppetlabs/puppetlabs-postgresql postgresql
-cd postgresql
-git checkout tags/3.3.3
-cd ..
 
 git clone https://github.com/puppetlabs/puppetlabs-stdlib stdlib
-cd stdlib
-git checkout tags/4.2.2
-cd ..
 
 git clone https://github.com/puppetlabs/puppetlabs-inifile inifile
-cd inifile
-git checkout tags/1.0.4
-cd ..
 
 git clone https://github.com/jtopjian/puppet-puppet puppet
 
@@ -214,5 +184,16 @@ node '${fqdn}' {
 EOF
 ln -s $SITE/ext/site.pp $PROD/manifests/
 
+
+sed -i '/sldir/,+1d' /etc/puppet/modules/puppet/manifests/master/passenger.pp
+sed -i '/Create Apache vhost/a \ \ $ssldir = '\''/var/lib/puppet/ssl'\''' /etc/puppet/modules/puppet/manifests/master/passenger.pp
+
+
 echo "===> puppet apply --verbose /etc/puppet/manifests/site.pp"
 puppet apply --verbose /etc/puppet/manifests/site.pp
+
+
+
+
+
+
