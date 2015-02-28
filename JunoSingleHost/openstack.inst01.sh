@@ -3,11 +3,14 @@
 MYSQL_PWD="password"
 RABBIT_PASS="password"
 KEYSTONE_DBPASS="password"
-MANAGEMETN_NETWORK_IP="172.22.1.162"
+MANAGEMETN_NETWORK_IP="10.0.0.127"
 KEYSTONE_HOSTNAME="myubuntu"
 SECRETE_ADMIN_TOKEN="password"
+ADMIN_PASS="password"
+EMAIL_ADDRESS="my@email.com"
 
 echo "===============> Installing MySQL server"
+sleep 5
 debconf-set-selections <<< "mysql-server mysql-server/root_password password ${MYSQL_PWD}"
 debconf-set-selections <<< "mysql-server mysql-server/root_password_again password ${MYSQL_PWD}"
 apt-get install -y mysql-server python-mysqldb
@@ -34,6 +37,7 @@ sed "s/MANAGEMETN_NETWORK_IP/${MANAGEMETN_NETWORK_IP}/g" ./my.cnf > /etc/mysql/m
 
 
 echo "===============> Installing RabbitMQ"
+sleep 10
 apt-get install -y rabbitmq-server
 rabbitmqctl change_password guest $RABBIT_PASS
 #https://www.rabbitmq.com/man/rabbitmqctl.1.man.html
@@ -42,6 +46,7 @@ service rabbitmq-server restart
 
 
 echo "===============> Installing Keystone"
+sleep 10
 mysql -u root -p${MYSQL_PWD} -e "CREATE DATABASE keystone;"
 mysql -u root -p${MYSQL_PWD} -e "GRANT ALL PRIVILEGES ON keystone.* TO 'keystone'@'localhost' IDENTIFIED BY '${KEYSTONE_DBPASS}';"
 mysql -u root -p${MYSQL_PWD} -e "GRANT ALL PRIVILEGES ON keystone.* TO 'keystone'@'%' IDENTIFIED BY '${KEYSTONE_DBPASS}';"
@@ -54,14 +59,22 @@ service keystone restart
 
 export OS_SERVICE_TOKEN=${SECRETE_ADMIN_TOKEN}
 export OS_SERVICE_ENDPOINT=http://${KEYSTONE_HOSTNAME}:35357/v2.0
+sleep 5
 keystone tenant-create --name admin --description "Admin Tenant"
 keystone user-create --name admin --pass ${ADMIN_PASS} --email ${EMAIL_ADDRESS}
 keystone role-create --name admin
 keystone user-role-add --user admin --tenant admin --role admin
 keystone tenant-create --name service --description "Service Tenant"
 keystone service-create --name keystone --type identity --description "OpenStack Identity"
-keystone endpoint-create --service-id $(keystone service-list | awk '/ identity / {print $2}') --publicurl http://controller:5000/v2.0 --internalurl http://controller:5000/v2.0 --adminurl http://controller:35357/v2.0 --region regionOne
+keystone endpoint-create --service-id $(keystone service-list | awk '/ identity / {print $2}') --publicurl http://${KEYSTONE_HOSTNAME}:5000/v2.0 --internalurl http://${KEYSTONE_HOSTNAME}:5000/v2.0 --adminurl http://${KEYSTONE_HOSTNAME}:35357/v2.0 --region regionOne
+unset OS_SERVICE_TOKEN 
+unset OS_SERVICE_ENDPOINT
 
-
+echo "===============> Keystone Verification"
+sleep 10
+keystone --os-tenant-name admin --os-username admin --os-password ${ADMIN_PASS} --os-auth-url http://${KEYSTONE_HOSTNAME}:35357/v2.0 token-get
+keystone --os-tenant-name admin --os-username admin --os-password ${ADMIN_PASS} --os-auth-url http://${KEYSTONE_HOSTNAME}:35357/v2.0 tenant-list
+keystone --os-tenant-name admin --os-username admin --os-password ${ADMIN_PASS} --os-auth-url http://${KEYSTONE_HOSTNAME}:35357/v2.0 user-list
+keystone --os-tenant-name admin --os-username admin --os-password ${ADMIN_PASS} --os-auth-url http://${KEYSTONE_HOSTNAME}:35357/v2.0 role-list
 
 
