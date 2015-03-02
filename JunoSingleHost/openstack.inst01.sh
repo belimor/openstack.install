@@ -11,6 +11,8 @@ ADMIN_PASS="password"
 EMAIL_ADDRESS="my@email.com"
 GLANCE_DBPASS="password"
 GLANCE_PASS="password"
+NOVA_DBPASS="password"
+NOVA_PASS="password"
 
 echo "===============> Installing MySQL server"
 sleep 5
@@ -114,6 +116,40 @@ wget -P /tmp/images http://cdn.download.cirros-cloud.net/0.3.3/cirros-0.3.3-x86_
 glance image-create --name "cirros-0.3.3-x86_64" --file /tmp/images/cirros-0.3.3-x86_64-disk.img --disk-format qcow2 --container-format bare --is-public True --progress
 glance image-list
 rm -r /tmp/images
+
+echo "===============> Installing Nova Compute Service"
+sleep 10
+apt-get install -y nova-api nova-cert nova-conductor nova-consoleauth nova-novncproxy nova-scheduler python-novaclient nova-compute sysfsutils
+mysql -u root -p${MYSQL_PWD} -e "CREATE DATABASE nova;"
+mysql -u root -p${MYSQL_PWD} -e "GRANT ALL PRIVILEGES ON nova.* TO 'nova'@'localhost' IDENTIFIED BY '${NOVA_DBPASS}';"
+mysql -u root -p${MYSQL_PWD} -e "GRANT ALL PRIVILEGES ON nova.* TO 'nova'@'%' IDENTIFIED BY '${NOVA_DBPASS}';"
+
+keystone user-create --name nova --pass ${NOVA_PASS}
+keystone user-role-add --user nova --tenant service --role admin
+keystone service-create --name nova --type compute --description "OpenStack Compute"
+keystone endpoint-create --service-id $(keystone service-list | awk '/ compute / {print $2}') --publicurl http://${CONTROLLER_HOSTNAME}:8774/v2/%\(tenant_id\)s --internalurl http://${CONTROLLER_HOSTNAME}:8774/v2/%\(tenant_id\)s --adminurl http://${CONTROLLER_HOSTNAME}:8774/v2/%\(tenant_id\)s --region regionOne
+
+sed "s/NOVA_PASS/${NOVA_PASS}/g;s/CONTROLLER_HOSTNAME/${CONTROLLER_HOSTNAME}/g;s/RABBIT_PASS/${RABBIT_PASS}/g;s/MANAGEMETN_NETWORK_IP/${MANAGEMETN_NETWORK_IP}/g;s/NOVA_DBPASS/${NOVA_DBPASS}/g" ./nova.conf > /etc/nova/nova.conf
+
+su -s /bin/sh -c "nova-manage db sync" nova
+rm -f /var/lib/nova/nova.sqlite
+
+service nova-api restart
+service nova-cert restart
+service nova-consoleauth restart
+service nova-scheduler restart
+service nova-conductor restart
+service nova-novncproxy restart
+service nova-compute restart
+
+echo "===============> Checking upport hardware acceleration"
+acceleration=$(egrep -c '(vmx|svm)' /proc/cpuinfo)
+echo ${acceleration}
+if [ $acceleration == 0 ]
+	then 
+	sed "s/virt_type=kvm/virt_type = qemu/g" ./nova-compute.conf > /etc/nova/nova-compute.conf
+	service nova-compute restart
+fi
 
 
 
