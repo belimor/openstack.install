@@ -1,18 +1,8 @@
 #!/bin/bash
 
-MYSQL_PWD="password"
-RABBIT_PASS="password"
-KEYSTONE_DBPASS="password"
-MANAGEMETN_NETWORK_IP="10.0.0.127"
-KEYSTONE_HOSTNAME="myubuntu"
-CONTROLLER_HOSTNAME="myubuntu"
-SECRETE_ADMIN_TOKEN="password"
-ADMIN_PASS="password"
-EMAIL_ADDRESS="my@email.com"
-GLANCE_DBPASS="password"
-GLANCE_PASS="password"
-NOVA_DBPASS="password"
-NOVA_PASS="password"
+source openstack.config
+echo ${MYSQL_PWD}
+sleep 10
 
 echo "===============> Installing MySQL server"
 sleep 5
@@ -156,6 +146,7 @@ fi
 echo "===============> Installing Nova Network"
 sleep 10
 apt-get install -y nova-network
+service nova-network restart
 
 echo "===============> Installing Horizon Dashboard"
 sleep 10
