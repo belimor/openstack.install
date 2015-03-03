@@ -157,6 +157,10 @@ echo "===============> Installing Nova Network"
 sleep 10
 apt-get install -y nova-network
 
-
+echo "===============> Installing Horizon Dashboard"
+sleep 10
+apt-get install -y openstack-dashboard apache2 libapache2-mod-wsgi memcached python-memcache
+service apache2 restart
+service memcached restart
 
 
