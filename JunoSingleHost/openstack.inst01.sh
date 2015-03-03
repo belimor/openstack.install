@@ -83,19 +83,20 @@ keystone --os-tenant-name admin --os-username admin --os-password ${ADMIN_PASS} 
 keystone --os-tenant-name admin --os-username admin --os-password ${ADMIN_PASS} --os-auth-url http://${CONTROLLER_HOSTNAME}:35357/v2.0 role-list
 
 echo "===============> Creating environment script admin-openrc.sh"
-sleep 10
+sleep 5
 echo "export OS_TENANT_NAME=admin" > admin-openrc.sh
 echo "export OS_USERNAME=admin" >> admin-openrc.sh
 echo "export OS_PASSWORD=${ADMIN_PASS}" >> admin-openrc.sh
 echo "export OS_AUTH_URL=http://${KEYSTONE_HOSTNAME}:35357/v2.0" >> admin-openrc.sh
+source admin-openrc.sh
 
 echo "===============> Installing Glance"
+sleep 10
 apt-get install -y glance python-glanceclient
 
 mysql -u root -p${MYSQL_PWD} -e "CREATE DATABASE glance;"
 mysql -u root -p${MYSQL_PWD} -e "GRANT ALL PRIVILEGES ON glance.* TO 'glance'@'localhost' IDENTIFIED BY '${GLANCE_DBPASS}';"
 mysql -u root -p${MYSQL_PWD} -e "GRANT ALL PRIVILEGES ON glance.* TO 'glance'@'%' IDENTIFIED BY '${GLANCE_DBPASS}';"
-source admin-openrc.sh
 keystone user-create --name glance --pass ${GLANCE_PASS}
 keystone user-role-add --user glance --tenant service --role admin
 keystone service-create --name glance --type image --description "OpenStack Image Service"
@@ -143,6 +144,7 @@ service nova-novncproxy restart
 service nova-compute restart
 
 echo "===============> Checking upport hardware acceleration"
+sleep 10
 acceleration=$(egrep -c '(vmx|svm)' /proc/cpuinfo)
 echo ${acceleration}
 if [ $acceleration == 0 ]
@@ -150,6 +152,10 @@ if [ $acceleration == 0 ]
 	sed "s/virt_type=kvm/virt_type = qemu/g" ./nova-compute.conf > /etc/nova/nova-compute.conf
 	service nova-compute restart
 fi
+
+echo "===============> Installing Nova Network"
+sleep 10
+apt-get install -y nova-network
 
 
 
