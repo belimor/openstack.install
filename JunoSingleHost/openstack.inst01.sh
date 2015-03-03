@@ -2,6 +2,22 @@
 
 source openstack.config
 echo ${MYSQL_PWD}
+echo ${SECRETE_ADMIN_TOKEN}
+echo ${RABBIT_PASS}
+echo ${NOVA_PASS}
+echo ${ADMIN_PASS}
+echo ${GLANCE_PASS}
+echo ${KEYSTONE_DBPASS}
+echo ${GLANCE_DBPASS}
+echo ${NOVA_DBPASS}
+echo ${MANAGEMETN_NETWORK_IP}
+echo ${KEYSTONE_HOSTNAME}
+echo ${CONTROLLER_HOSTNAME}
+echo ${BRIDGE_FLAT}
+echo ${INTERFACE_FLAT}
+echo ${INTERFACE_PUB}
+
+EMAIL_ADDRESS="my@email.com"
 sleep 10
 
 echo "===============> Installing MySQL server"
