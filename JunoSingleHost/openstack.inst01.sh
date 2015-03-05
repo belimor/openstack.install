@@ -1,25 +1,8 @@
 #!/bin/bash
 
 source openstack.config
-echo ${MYSQL_PWD}
-echo ${SECRETE_ADMIN_TOKEN}
-echo ${RABBIT_PASS}
-echo ${NOVA_PASS}
-echo ${ADMIN_PASS}
-echo ${GLANCE_PASS}
-echo ${KEYSTONE_DBPASS}
-echo ${GLANCE_DBPASS}
-echo ${NOVA_DBPASS}
-echo ${MANAGEMETN_NETWORK_IP}
-echo ${KEYSTONE_HOSTNAME}
-echo ${CONTROLLER_HOSTNAME}
-echo ${BRIDGE_FLAT}
-echo ${INTERFACE_FLAT}
-echo ${INTERFACE_PUB}
 
-EMAIL_ADDRESS="my@email.com"
-sleep 10
-
+echo "===============> OpenStack Installation. Single Host. Single Interface"
 echo "===============> Installing MySQL server"
 sleep 5
 debconf-set-selections <<< "mysql-server mysql-server/root_password password ${MYSQL_PWD}"
@@ -95,6 +78,7 @@ echo "export OS_USERNAME=admin" >> admin-openrc.sh
 echo "export OS_PASSWORD=${ADMIN_PASS}" >> admin-openrc.sh
 echo "export OS_AUTH_URL=http://${KEYSTONE_HOSTNAME}:35357/v2.0" >> admin-openrc.sh
 source admin-openrc.sh
+cat admin-openrc.sh
 
 echo "===============> Installing Glance"
 sleep 10
@@ -155,13 +139,19 @@ acceleration=$(egrep -c '(vmx|svm)' /proc/cpuinfo)
 echo ${acceleration}
 if [ $acceleration == 0 ]
 	then 
+	cat /etc/nova/nova-compute.conf | grep virt_type
 	sed "s/virt_type=kvm/virt_type = qemu/g" ./nova-compute.conf > /etc/nova/nova-compute.conf
 	service nova-compute restart
+	echo "virt_type has been changed"
+	cat /etc/nova/nova-compute.conf | grep virt_type
 fi
 
 echo "===============> Installing Nova Network"
 sleep 10
 apt-get install -y nova-network
+sed -i "s/BRIDGE_FLAT/${BRIDGE_FLAT}/g" /etc/nova/nova.conf
+sed -i "s/INTERFACE_FLAT/${INTERFACE_FLAT}/g" /etc/nova/nova.conf
+sed -i "s/INTERFACE_PUB/${INTERFACE_PUB}/g" /etc/nova/nova.conf
 service nova-network restart
 
 echo "===============> Installing Horizon Dashboard"
