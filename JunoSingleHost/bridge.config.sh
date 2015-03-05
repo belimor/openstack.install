@@ -2,6 +2,8 @@
 
 source openstack.config
 
+apt-get install -y bridge-utils
+
 sed -i 's/iface eth0 inet dhcp/iface eth0 inet manual/g' /etc/network/interfaces
 
 cat >> /etc/network/interfaces <<EOF
@@ -13,6 +15,6 @@ iface br100 inet dhcp
 auto br111
 iface br111 inet static
   bridge_ports eth0
-  address ${OPENSTACK_INTERNAL_NETWORKIP}
+  address ${OPENSTACK_INTERNAL_NETWORK_GW}
   netmask ${OPENSTACK_INTERNAL_NETMASK}
 EOF
