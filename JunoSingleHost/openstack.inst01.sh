@@ -160,4 +160,34 @@ apt-get install -y openstack-dashboard apache2 libapache2-mod-wsgi memcached pyt
 service apache2 restart
 service memcached restart
 
+echo "===============> Installing Cinder"
+sleep 10
+apt-get install -y lvm2
+pvcreate /dev/sdb1
+vgcreate cinder-volumes /dev/sdb1
+sed -i 's/[ "a/.*/" ]/[ "a/sdb/", "r/.*/"]/g' etc/lvm/lvm.conf
+
+apt-get install -y cinder-api cinder-scheduler python-cinderclient 
+apt-get install -y cinder-volume python-mysqldb
+mysql -u root -p${MYSQL_PWD} -e "CREATE DATABASE cinder;"
+mysql -u root -p${MYSQL_PWD} -e "GRANT ALL PRIVILEGES ON cinder.* TO 'cinder'@'localhost' IDENTIFIED BY '${CINDER_DBPASS}';"
+mysql -u root -p${MYSQL_PWD} -e "GRANT ALL PRIVILEGES ON cinder.* TO 'cinder'@'%' IDENTIFIED BY '${CINDER_DBPASS}';"
+
+keystone user-create --name cinder --pass ${CINDER_PASS}
+keystone user-role-add --user cinder --tenant service --role admin
+keystone service-create --name cinder --type volume --description "OpenStack Block Storage"
+keystone service-create --name cinderv2 --type volumev2 --description "OpenStack Block Storage"
+
+keystone endpoint-create --service-id $(keystone service-list | awk '/ volume / {print $2}') --publicurl http://${CONTROLLER_HOSTNAME}:8776/v1/%\(tenant_id\)s --internalurl http://${CONTROLLER_HOSTNAME}:8776/v1/%\(tenant_id\)s --adminurl http://${CONTROLLER_HOSTNAME}:8776/v1/%\(tenant_id\)s --region regionOne
+keystone endpoint-create --service-id $(keystone service-list | awk '/ volumev2 / {print $2}') --publicurl http://${CONTROLLER_HOSTNAME}:8776/v2/%\(tenant_id\)s --internalurl http://${CONTROLLER_HOSTNAME}:8776/v2/%\(tenant_id\)s --adminurl http://${CONTROLLER_HOSTNAME}:8776/v2/%\(tenant_id\)s --region regionOne
+
+sed "s/CINDER_PASS/${CINDER_PASS}/g;s/CONTROLLER_HOSTNAME/${CONTROLLER_HOSTNAME}/g;s/RABBIT_PASS/${RABBIT_PASS}/g;s/MANAGEMETN_NETWORK_IP/${MANAGEMETN_NETWORK_IP}/g;s/CINDER_DBPASS/${CINDER_DBPASS}/g" ./cinder.conf > /etc/cinder/cinder.conf
+
+rm -f /var/lib/cinder/cinder.sqlite
+su -s /bin/sh -c "cinder-manage db sync" cinder
+service cinder-scheduler restart
+service cinder-api restart
+service tgt restart
+service cinder-volume restart
+
 
