@@ -1,8 +1,9 @@
 #!/bin/bash
 
 source openstack.config
-
+echo -e "\n\n\n"
 echo "===============> OpenStack Installation. Single Host. Single Interface"
+echo -e "\n\n\n"
 echo "===============> Installing MySQL server"
 sleep 5
 debconf-set-selections <<< "mysql-server mysql-server/root_password password ${MYSQL_PWD}"
@@ -162,10 +163,6 @@ service memcached restart
 
 echo "===============> Installing Cinder"
 sleep 10
-apt-get install -y lvm2
-pvcreate /dev/sdb1
-vgcreate cinder-volumes /dev/sdb1
-sed -i 's/[ "a/.*/" ]/[ "a/sdb/", "r/.*/"]/g' etc/lvm/lvm.conf
 
 apt-get install -y cinder-api cinder-scheduler python-cinderclient 
 apt-get install -y cinder-volume python-mysqldb
