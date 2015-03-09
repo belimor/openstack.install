@@ -31,6 +31,6 @@ Network Configuration:
            |                              |
            +------------------------------+
  
-HDD:
-/dev/sda
-/dev/sdb
+ HDD:
+ /dev/sda
+ /dev/sdb
