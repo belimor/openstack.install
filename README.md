@@ -8,14 +8,14 @@ http://docs.openstack.org/juno/install-guide/install/apt/content/ch_preface.html
 
 Network Configuration:
 
-      +------------------------------+
-      |                              |
-      |   OpenStack Host             |
-      |                              |
-      |      VM0        VM1          |
-      |   +-------+  +-------+       |
-      |   |       |  |       |       |
-      |   | vnet0 |  | vnet1 |       |
+           +------------------------------+
+           |                              |
+           |   OpenStack Host             |
+           |                              |
+           |      VM0        VM1          |
+           |   +-------+  +-------+       |
+           |   |       |  |       |       |
+           |   | vnet0 |  | vnet1 |       |
            |   |       |  |       |       |
            |   +---+---+  +---+---+       |
            |       |          |           |
