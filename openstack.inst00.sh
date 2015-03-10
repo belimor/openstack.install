@@ -39,7 +39,7 @@ echo -e "n\np\n1\n\n\nw" | fdisk /dev/${CINDER_DEVICE}
 apt-get install -y lvm2
 pvcreate /dev/${CINDER_DEVICE}1
 vgcreate cinder-volumes /dev/${CINDER_DEVICE}1
-sed -i 's/[ "a/.*/" ]/[ "a/${CINDER_DEVICE}/", "r/.*/"]/g' etc/lvm/lvm.conf
+sed -i 's/\[ "a\/\.\*\/" \]/\[ "a\/'${CINDER_DEVICE}'\/", "r\/\.\*\/" \]/g' /etc/lvm/lvm.conf
 
 echo "===============> Configuring Juno Repository"
 sleep 10
