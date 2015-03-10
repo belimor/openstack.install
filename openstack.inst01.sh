@@ -28,7 +28,7 @@ send \"y\r\"
 expect eof
 ")
 echo "$SECURE_MYSQL"
-sed "s/MANAGEMETN_NETWORK_IP/${MANAGEMETN_NETWORK_IP}/g" ./my.cnf > /etc/mysql/my.cnf
+sed "s/MANAGEMETN_NETWORK_IP/${MANAGEMETN_NETWORK_IP}/g" ./confs/my.cnf > /etc/mysql/my.cnf
 
 
 echo "===============> Installing RabbitMQ"
@@ -46,7 +46,7 @@ mysql -u root -p${MYSQL_PWD} -e "CREATE DATABASE keystone;"
 mysql -u root -p${MYSQL_PWD} -e "GRANT ALL PRIVILEGES ON keystone.* TO 'keystone'@'localhost' IDENTIFIED BY '${KEYSTONE_DBPASS}';"
 mysql -u root -p${MYSQL_PWD} -e "GRANT ALL PRIVILEGES ON keystone.* TO 'keystone'@'%' IDENTIFIED BY '${KEYSTONE_DBPASS}';"
 apt-get install -y keystone python-keystoneclient
-sed "s/SECRETE_ADMIN_TOKEN/${SECRETE_ADMIN_TOKEN}/g;s/KEYSTONE_HOSTNAME/${CONTROLLER_HOSTNAME}/g;s/KEYSTONE_DBPASS/${KEYSTONE_DBPASS}/g" ./keystone.conf > /etc/keystone/keystone.conf
+sed "s/SECRETE_ADMIN_TOKEN/${SECRETE_ADMIN_TOKEN}/g;s/KEYSTONE_HOSTNAME/${CONTROLLER_HOSTNAME}/g;s/KEYSTONE_DBPASS/${KEYSTONE_DBPASS}/g" ./confs/keystone.conf > /etc/keystone/keystone.conf
 su -s /bin/sh -c "keystone-manage db_sync" keystone
 rm -f /var/lib/keystone/keystone.db
 service keystone restart
@@ -93,8 +93,8 @@ keystone user-role-add --user glance --tenant service --role admin
 keystone service-create --name glance --type image --description "OpenStack Image Service"
 keystone endpoint-create --service-id $(keystone service-list | awk '/ image / {print $2}') --publicurl http://${CONTROLLER_HOSTNAME}:9292 --internalurl http://${CONTROLLER_HOSTNAME}:9292 --adminurl http://${CONTROLLER_HOSTNAME}:9292 --region regionOne
 
-sed "s/GLANCE_DBPASS/${GLANCE_DBPASS}/g;s/CONTROLLER_HOSTNAME/${CONTROLLER_HOSTNAME}/g;s/GLANCE_PASS/${GLANCE_PASS}/g" ./glance-api.conf > /etc/glance/glance-api.conf
-sed "s/GLANCE_DBPASS/${GLANCE_DBPASS}/g;s/CONTROLLER_HOSTNAME/${CONTROLLER_HOSTNAME}/g;s/GLANCE_PASS/${GLANCE_PASS}/g" ./glance-registry.conf > /etc/glance/glance-registry.conf
+sed "s/GLANCE_DBPASS/${GLANCE_DBPASS}/g;s/CONTROLLER_HOSTNAME/${CONTROLLER_HOSTNAME}/g;s/GLANCE_PASS/${GLANCE_PASS}/g" ./confs/glance-api.conf > /etc/glance/glance-api.conf
+sed "s/GLANCE_DBPASS/${GLANCE_DBPASS}/g;s/CONTROLLER_HOSTNAME/${CONTROLLER_HOSTNAME}/g;s/GLANCE_PASS/${GLANCE_PASS}/g" ./confs/glance-registry.conf > /etc/glance/glance-registry.conf
 
 su -s /bin/sh -c "glance-manage db_sync" glance
 rm -f /var/lib/glance/glance.sqlite
@@ -121,7 +121,7 @@ keystone user-role-add --user nova --tenant service --role admin
 keystone service-create --name nova --type compute --description "OpenStack Compute"
 keystone endpoint-create --service-id $(keystone service-list | awk '/ compute / {print $2}') --publicurl http://${CONTROLLER_HOSTNAME}:8774/v2/%\(tenant_id\)s --internalurl http://${CONTROLLER_HOSTNAME}:8774/v2/%\(tenant_id\)s --adminurl http://${CONTROLLER_HOSTNAME}:8774/v2/%\(tenant_id\)s --region regionOne
 
-sed "s/NOVA_PASS/${NOVA_PASS}/g;s/CONTROLLER_HOSTNAME/${CONTROLLER_HOSTNAME}/g;s/RABBIT_PASS/${RABBIT_PASS}/g;s/MANAGEMETN_NETWORK_IP/${MANAGEMETN_NETWORK_IP}/g;s/NOVA_DBPASS/${NOVA_DBPASS}/g" ./nova.conf > /etc/nova/nova.conf
+sed "s/NOVA_PASS/${NOVA_PASS}/g;s/CONTROLLER_HOSTNAME/${CONTROLLER_HOSTNAME}/g;s/RABBIT_PASS/${RABBIT_PASS}/g;s/MANAGEMETN_NETWORK_IP/${MANAGEMETN_NETWORK_IP}/g;s/NOVA_DBPASS/${NOVA_DBPASS}/g" ./confs/nova.conf > /etc/nova/nova.conf
 
 su -s /bin/sh -c "nova-manage db sync" nova
 rm -f /var/lib/nova/nova.sqlite
@@ -141,7 +141,7 @@ echo ${acceleration}
 if [ $acceleration == 0 ]
 	then 
 	cat /etc/nova/nova-compute.conf | grep virt_type
-	sed "s/virt_type=kvm/virt_type = qemu/g" ./nova-compute.conf > /etc/nova/nova-compute.conf
+	sed "s/virt_type=kvm/virt_type = qemu/g" ./confs/nova-compute.conf > /etc/nova/nova-compute.conf
 	service nova-compute restart
 	echo "virt_type has been changed"
 	cat /etc/nova/nova-compute.conf | grep virt_type
@@ -178,7 +178,7 @@ keystone service-create --name cinderv2 --type volumev2 --description "OpenStack
 keystone endpoint-create --service-id $(keystone service-list | awk '/ volume / {print $2}') --publicurl http://${CONTROLLER_HOSTNAME}:8776/v1/%\(tenant_id\)s --internalurl http://${CONTROLLER_HOSTNAME}:8776/v1/%\(tenant_id\)s --adminurl http://${CONTROLLER_HOSTNAME}:8776/v1/%\(tenant_id\)s --region regionOne
 keystone endpoint-create --service-id $(keystone service-list | awk '/ volumev2 / {print $2}') --publicurl http://${CONTROLLER_HOSTNAME}:8776/v2/%\(tenant_id\)s --internalurl http://${CONTROLLER_HOSTNAME}:8776/v2/%\(tenant_id\)s --adminurl http://${CONTROLLER_HOSTNAME}:8776/v2/%\(tenant_id\)s --region regionOne
 
-sed "s/CINDER_PASS/${CINDER_PASS}/g;s/CONTROLLER_HOSTNAME/${CONTROLLER_HOSTNAME}/g;s/RABBIT_PASS/${RABBIT_PASS}/g;s/MANAGEMETN_NETWORK_IP/${MANAGEMETN_NETWORK_IP}/g;s/CINDER_DBPASS/${CINDER_DBPASS}/g" ./cinder.conf > /etc/cinder/cinder.conf
+sed "s/CINDER_PASS/${CINDER_PASS}/g;s/CONTROLLER_HOSTNAME/${CONTROLLER_HOSTNAME}/g;s/RABBIT_PASS/${RABBIT_PASS}/g;s/MANAGEMETN_NETWORK_IP/${MANAGEMETN_NETWORK_IP}/g;s/CINDER_DBPASS/${CINDER_DBPASS}/g" ./confs/cinder.conf > /etc/cinder/cinder.conf
 
 rm -f /var/lib/cinder/cinder.sqlite
 su -s /bin/sh -c "cinder-manage db sync" cinder
