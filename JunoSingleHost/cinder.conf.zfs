@@ -1,0 +1,37 @@
+[DEFAULT]
+rootwrap_config = /etc/cinder/rootwrap.conf
+api_paste_confg = /etc/cinder/api-paste.ini
+iscsi_helper = tgtadm
+#volume_name_template = volume-%s
+#volume_group = cinder-volumes
+verbose = True
+#auth_strategy = keystone
+#state_path = /var/lib/cinder
+#lock_path = /var/lock/cinder
+#volumes_dir = /var/lib/cinder/volumes
+
+my_ip = 172.22.1.171
+
+verbose = True
+
+rpc_backend = rabbit
+rabbit_host = myubuntu
+rabbit_password = password
+
+auth_strategy = keystone
+
+nfs_shares_config = /etc/cinder/nfsshares
+volume_driver = cinder.volume.drivers.nfs.NfsDriver
+nfs_sparsed_volumes=True
+nfs_mount_point_base=/BOX/cindermnt
+ 
+[keystone_authtoken]
+auth_uri = http://myubuntu:5000/v2.0
+identity_uri = http://myubuntu:35357
+admin_tenant_name = service
+admin_user = cinder
+admin_password = password
+
+[database]
+connection = mysql://cinder:password@myubuntu/cinder
+
