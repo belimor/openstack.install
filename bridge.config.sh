@@ -2,8 +2,10 @@
 
 source openstack.config
 
+echo -e "\n"
 echo "===============> Configuring Bridge"
 sleep 5
+echo -e "\n"
 
 apt-get install -y bridge-utils
 
@@ -16,14 +18,13 @@ iface br100 inet dhcp
   bridge_ports eth0
 
 auto br111
-iface br111 inet static
+iface br111 inet manual
   bridge_ports eth0
-  address ${OPENSTACK_INTERNAL_NETWORK_GW}
-  netmask ${OPENSTACK_INTERNAL_NETMASK}
 EOF
 
-
+echo -e "\n"
 echo "===============> rebooting... (press ctr+c to stop)"
 sleep 10
+echo -e "\n"
 
 reboot

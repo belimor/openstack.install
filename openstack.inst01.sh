@@ -1,11 +1,12 @@
 #!/bin/bash
 
 source openstack.config
-echo -e "\n\n\n"
+echo -e "\n"
 echo "===============> OpenStack Installation. Single Host. Single Interface"
-echo -e "\n\n\n"
+echo -e "\n"
 echo "===============> Installing MySQL server"
 sleep 5
+echo -e "\n"
 debconf-set-selections <<< "mysql-server mysql-server/root_password password ${MYSQL_PWD}"
 debconf-set-selections <<< "mysql-server mysql-server/root_password_again password ${MYSQL_PWD}"
 apt-get install -y mysql-server python-mysqldb
@@ -30,18 +31,22 @@ expect eof
 echo "$SECURE_MYSQL"
 sed "s/MANAGEMETN_NETWORK_IP/${MANAGEMETN_NETWORK_IP}/g" ./my.cnf > /etc/mysql/my.cnf
 
-
+echo -e "\n"
 echo "===============> Installing RabbitMQ"
 sleep 10
+echo -e "\n"
+
 apt-get install -y rabbitmq-server
 rabbitmqctl change_password guest $RABBIT_PASS
 #https://www.rabbitmq.com/man/rabbitmqctl.1.man.html
 #http://docs.openstack.org/juno/install-guide/install/apt/content/ch_basic_environment.html#basics-messaging-server
 service rabbitmq-server restart
 
-
+echo -e "\n"
 echo "===============> Installing Keystone"
 sleep 10
+echo -e "\n"
+
 mysql -u root -p${MYSQL_PWD} -e "CREATE DATABASE keystone;"
 mysql -u root -p${MYSQL_PWD} -e "GRANT ALL PRIVILEGES ON keystone.* TO 'keystone'@'localhost' IDENTIFIED BY '${KEYSTONE_DBPASS}';"
 mysql -u root -p${MYSQL_PWD} -e "GRANT ALL PRIVILEGES ON keystone.* TO 'keystone'@'%' IDENTIFIED BY '${KEYSTONE_DBPASS}';"
@@ -54,7 +59,7 @@ service keystone restart
 
 export OS_SERVICE_TOKEN=${SECRETE_ADMIN_TOKEN}
 export OS_SERVICE_ENDPOINT=http://${CONTROLLER_HOSTNAME}:35357/v2.0
-sleep 5
+sleep 10
 keystone tenant-create --name admin --description "Admin Tenant"
 keystone user-create --name admin --pass ${ADMIN_PASS} --email ${EMAIL_ADDRESS}
 keystone role-create --name admin
@@ -65,15 +70,21 @@ keystone endpoint-create --service-id $(keystone service-list | awk '/ identity 
 unset OS_SERVICE_TOKEN 
 unset OS_SERVICE_ENDPOINT
 
+echo -e "\n"
 echo "===============> Keystone Verification"
 sleep 10
+echo -e "\n"
+
 keystone --os-tenant-name admin --os-username admin --os-password ${ADMIN_PASS} --os-auth-url http://${CONTROLLER_HOSTNAME}:35357/v2.0 token-get
 keystone --os-tenant-name admin --os-username admin --os-password ${ADMIN_PASS} --os-auth-url http://${CONTROLLER_HOSTNAME}:35357/v2.0 tenant-list
 keystone --os-tenant-name admin --os-username admin --os-password ${ADMIN_PASS} --os-auth-url http://${CONTROLLER_HOSTNAME}:35357/v2.0 user-list
 keystone --os-tenant-name admin --os-username admin --os-password ${ADMIN_PASS} --os-auth-url http://${CONTROLLER_HOSTNAME}:35357/v2.0 role-list
 
+echo -e "\n"
 echo "===============> Creating environment script admin-openrc.sh"
-sleep 5
+sleep 10
+echo -e "\n"
+
 echo "export OS_TENANT_NAME=admin" > admin-openrc.sh
 echo "export OS_USERNAME=admin" >> admin-openrc.sh
 echo "export OS_PASSWORD=${ADMIN_PASS}" >> admin-openrc.sh
@@ -81,8 +92,11 @@ echo "export OS_AUTH_URL=http://${KEYSTONE_HOSTNAME}:35357/v2.0" >> admin-openrc
 source admin-openrc.sh
 cat admin-openrc.sh
 
+echo -e "\n"
 echo "===============> Installing Glance"
 sleep 10
+echo -e "\n"
+
 apt-get install -y glance python-glanceclient
 
 mysql -u root -p${MYSQL_PWD} -e "CREATE DATABASE glance;"
@@ -101,16 +115,22 @@ rm -f /var/lib/glance/glance.sqlite
 service glance-registry restart
 service glance-api restart
 
+echo -e "\n"
 echo "===============> Keystone Verification"
 sleep 10
+echo -e "\n"
+
 mkdir /tmp/images
 wget -P /tmp/images http://cdn.download.cirros-cloud.net/0.3.3/cirros-0.3.3-x86_64-disk.img
 glance image-create --name "cirros-0.3.3-x86_64" --file /tmp/images/cirros-0.3.3-x86_64-disk.img --disk-format qcow2 --container-format bare --is-public True --progress
 glance image-list
 rm -r /tmp/images
 
+echo -e "\n"
 echo "===============> Installing Nova Compute Service"
 sleep 10
+echo -e "\n"
+
 apt-get install -y nova-api nova-cert nova-conductor nova-consoleauth nova-novncproxy nova-scheduler python-novaclient nova-compute sysfsutils
 mysql -u root -p${MYSQL_PWD} -e "CREATE DATABASE nova;"
 mysql -u root -p${MYSQL_PWD} -e "GRANT ALL PRIVILEGES ON nova.* TO 'nova'@'localhost' IDENTIFIED BY '${NOVA_DBPASS}';"
@@ -134,8 +154,11 @@ service nova-conductor restart
 service nova-novncproxy restart
 service nova-compute restart
 
+echo -e "\n"
 echo "===============> Checking upport hardware acceleration"
 sleep 10
+echo -e "\n"
+
 acceleration=$(egrep -c '(vmx|svm)' /proc/cpuinfo)
 echo ${acceleration}
 if [ $acceleration == 0 ]
@@ -147,22 +170,30 @@ if [ $acceleration == 0 ]
 	cat /etc/nova/nova-compute.conf | grep virt_type
 fi
 
+echo -e "\n"
 echo "===============> Installing Nova Network"
 sleep 10
+echo -e "\n"
+
 apt-get install -y nova-network
 sed -i "s/BRIDGE_FLAT/${BRIDGE_FLAT}/g" /etc/nova/nova.conf
 sed -i "s/INTERFACE_FLAT/${INTERFACE_FLAT}/g" /etc/nova/nova.conf
 sed -i "s/INTERFACE_PUB/${INTERFACE_PUB}/g" /etc/nova/nova.conf
 service nova-network restart
 
+echo -e "\n"
 echo "===============> Installing Horizon Dashboard"
 sleep 10
+echo -e "\n"
+
 apt-get install -y openstack-dashboard apache2 libapache2-mod-wsgi memcached python-memcache
 service apache2 restart
 service memcached restart
 
+echo -e "\n"
 echo "===============> Installing Cinder"
 sleep 10
+echo -e "\n"
 
 apt-get install -y cinder-api cinder-scheduler python-cinderclient 
 apt-get install -y cinder-volume python-mysqldb
@@ -178,7 +209,7 @@ keystone service-create --name cinderv2 --type volumev2 --description "OpenStack
 keystone endpoint-create --service-id $(keystone service-list | awk '/ volume / {print $2}') --publicurl http://${CONTROLLER_HOSTNAME}:8776/v1/%\(tenant_id\)s --internalurl http://${CONTROLLER_HOSTNAME}:8776/v1/%\(tenant_id\)s --adminurl http://${CONTROLLER_HOSTNAME}:8776/v1/%\(tenant_id\)s --region regionOne
 keystone endpoint-create --service-id $(keystone service-list | awk '/ volumev2 / {print $2}') --publicurl http://${CONTROLLER_HOSTNAME}:8776/v2/%\(tenant_id\)s --internalurl http://${CONTROLLER_HOSTNAME}:8776/v2/%\(tenant_id\)s --adminurl http://${CONTROLLER_HOSTNAME}:8776/v2/%\(tenant_id\)s --region regionOne
 
-sed "s/CINDER_PASS/${CINDER_PASS}/g;s/CONTROLLER_HOSTNAME/${CONTROLLER_HOSTNAME}/g;s/RABBIT_PASS/${RABBIT_PASS}/g;s/MANAGEMETN_NETWORK_IP/${MANAGEMETN_NETWORK_IP}/g;s/CINDER_DBPASS/${CINDER_DBPASS}/g" ./cinder.conf > /etc/cinder/cinder.conf
+sed "s/CINDER_PASS/${CINDER_PASS}/g;s/CONTROLLER_HOSTNAME/${CONTROLLER_HOSTNAME}/g;s/RABBIT_PASS/${RABBIT_PASS}/g;s/MANAGEMETN_NETWORK_IP/${MANAGEMETN_NETWORK_IP}/g;s/CINDER_DBPASS/${CINDER_DBPASS}/g" ./cinder.conf.zfs > /etc/cinder/cinder.conf
 
 rm -f /var/lib/cinder/cinder.sqlite
 su -s /bin/sh -c "cinder-manage db sync" cinder
